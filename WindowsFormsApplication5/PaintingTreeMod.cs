@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace RedBlackTreeNamespace
 {
-    public class NodeAndPoint
+    public class xOy
     {
         public Point point;
         public TreeNode node;
 
-        public NodeAndPoint(Point point, TreeNode node)
+        public xOy(Point point, TreeNode node)
         {
             this.point = point;
             this.node = node;
@@ -26,28 +26,30 @@ namespace RedBlackTreeNamespace
 
     public class PaintingTree
     {
-        public List< List < NodeAndPoint > > _listOfLevel; //индексами являются уровни
-        static SolidBrush NodeRedBrush;
-        static SolidBrush NodeBlackBrush;
-        static SolidBrush textBrush;
-        static Pen linePen;
+        public List< List < xOy > > _listOfLevel; //индексами являются уровни
+        static TreeNode CurrentNodeForSearch;
+        static SolidBrush NodeRed;
+        static SolidBrush NodeBlack;
+        static Pen CurrentNode;
+        static SolidBrush text;
+        static Pen line;
         static Font font;
-        public static int diametr = 30;
-        static Graphics _area;
-        public PaintingTree(int capacity)
+        public static int diametr;
+        static Graphics canvas;
+        public PaintingTree(int capacity,TreeNode cur)
         {
-            _listOfLevel = new List<List<NodeAndPoint>>(capacity);
+            _listOfLevel = new List<List<xOy>>(capacity);
             for (int i = 0; i <= capacity; i++)
             {
-                List<NodeAndPoint> list = new List<NodeAndPoint>();
+                List<xOy> list = new List<xOy>();
                 _listOfLevel.Add(list);
             }
-
+            CurrentNodeForSearch = cur;
         }
         public void AddNodeToList(TreeNode node, int level)
         {
             Point point = new Point(0);
-            NodeAndPoint nap = new NodeAndPoint(point, node);
+            xOy nap = new xOy(point, node);
             _listOfLevel[level].Add(nap);
         }
 
@@ -56,48 +58,51 @@ namespace RedBlackTreeNamespace
             return _listOfLevel.Count;
         }
 
-        public List<NodeAndPoint> getLevel(int level)
+        public List<xOy> getLevel(int level)
         {
             return _listOfLevel[level];
         }
-        private static void Initial(Graphics area)
+        private static void Initial(Graphics Canvas)
         {
-            NodeRedBrush = new SolidBrush(Color.Red);
-            NodeBlackBrush = new SolidBrush(Color.Black);
-            textBrush = new SolidBrush(Color.WhiteSmoke);
-            linePen = new Pen(Color.Black);
+            NodeRed = new SolidBrush(Color.Red);
+            NodeBlack = new SolidBrush(Color.Black);
+            CurrentNode = new Pen(Color.FloralWhite);
+            CurrentNode.Width = 2;
+            text = new SolidBrush(Color.WhiteSmoke);
+            line = new Pen(Color.Black);
             font = new Font(FontFamily.GenericMonospace, 12);
-            _area = area;
+            canvas = Canvas;
+            diametr = 30;
         }
 
-        public static void Draw(PaintingTree showtree, int width, int height, Graphics area)
+        public static void Draw(PaintingTree showtree, int width, int height, Graphics canvas)
         {
-
+            canvas.Clear(Color.DarkGray);
+            Initial(canvas);
             int currentHeight = 0;
-            Initial(area);
-
-            int countLevel = showtree.getCountLevel();
-            for (int i = 0; i < countLevel; i++)
+            for (int i = 0; i < showtree.getCountLevel(); i++)
             {
-                List<NodeAndPoint> currentLevel = showtree.getLevel(i);
+                List<xOy> currentLevel = showtree.getLevel(i);
                 int countNode = currentLevel.Count;
                 int interval = width / (countNode + 1);
 
                 for (int j = 0; j < countNode; j++)
                 {
-                    #region DrawNode
+                    
                     Rectangle rect = new Rectangle((j + 1) * interval, currentHeight, diametr, diametr);
                     if(currentLevel[j].node.color==TreeColor.red)
-                         area.FillEllipse(NodeRedBrush, rect);
+                         canvas.FillEllipse(NodeRed, rect);
                     else
-                        area.FillEllipse(NodeBlackBrush, rect);
+                        canvas.FillEllipse(NodeBlack, rect);
+                    canvas.DrawEllipse(line, rect);
+                    if (currentLevel[j].node == CurrentNodeForSearch)
+                        canvas.DrawEllipse(CurrentNode, rect);
 
-                    area.DrawEllipse(linePen, rect);
-                    #endregion
+
 
                     currentLevel[j].point = new Point((j + 1) * interval, currentHeight);
                     String data = currentLevel[j].getData().ToString();
-                    area.DrawString(data, font, textBrush, currentLevel[j].point);
+                    canvas.DrawString(data, font, text, currentLevel[j].point);
 
 
                     LineToParent(currentLevel[j].node,currentLevel, showtree, j);
@@ -108,17 +113,13 @@ namespace RedBlackTreeNamespace
             }
         }
 
-        private static void DrawNode()
-        {
-
-        }
-        private static void LineToParent( TreeNode Current ,List<NodeAndPoint> currentLevel, PaintingTree showtree, int index)
+        private static void LineToParent( TreeNode Current ,List<xOy> currentLevel, PaintingTree showtree, int index)
         {
             int indexParentLevel = (int)(currentLevel[index].node.level - 1);
 
             if (indexParentLevel != -1)
             {
-                List<NodeAndPoint> parentLevel = showtree.getLevel(indexParentLevel);
+                List<xOy> parentLevel = showtree.getLevel(indexParentLevel);
                 foreach (var elem in parentLevel)
                     if (elem.node == Current.parent)
                     {
@@ -131,7 +132,7 @@ namespace RedBlackTreeNamespace
 
                         Point childPoint = new Point(childX, childY);
 
-                        _area.DrawLine(linePen, parentPoint, childPoint);
+                        canvas.DrawLine(line, parentPoint, childPoint);
                         break;
                     }
             }

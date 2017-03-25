@@ -20,33 +20,16 @@ namespace RedBlackTreeNamespace
         }
         private void DrawTree()
         {
-            Graphics area = pictureBox1.CreateGraphics();
-            area.Clear(Color.White);
-            int w = pictureBox1.Width;
-            int h = pictureBox1.Height;
+            Graphics canvas = pictureBox1.CreateGraphics();
             paintingTree = tree.bfs();
-            PaintingTree.Draw(paintingTree, w, h, area);
+            PaintingTree.Draw(paintingTree, pictureBox1.Width, pictureBox1.Height, canvas);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-           //  int temp = Convert.ToInt32(textBox1.Text);
-           //  tree.insert(temp);
-          //  textBox1.Text = "";
-            tree.insert(23);
-             tree.insert(12);
-              tree.insert(65);
-             tree.insert(11);
-            tree.insert(17);
-            tree.insert(36);
-            tree.insert(77);
-            tree.insert(3);
-            tree.insert(27);
-            tree.insert(47);
-            tree.insert(69);
-            tree.insert(82);
-            tree.insert(35);
-            tree.insert(100);
+             int temp = Convert.ToInt32(textBox1.Text);
+             tree.insert(temp);
+             textBox1.Text = "";
             DrawTree();
         }
 
@@ -55,6 +38,33 @@ namespace RedBlackTreeNamespace
             int temp = Convert.ToInt32(textBox2.Text);
             tree.For_Delete(temp);
            DrawTree();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Random rand = new Random();
+            int Min= Convert.ToInt32(textBox4.Text);
+            int Max=Convert.ToInt32(textBox5.Text);
+             for (int i=0; i < Convert.ToInt32(textBox3.Text); i++)
+                tree.insert(rand.Next(Min,Max));
+            DrawTree();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            int find = Convert.ToInt32(textBox6.Text);
+            tree.For_Search(find);
+            DrawTree();
         }
     }
 }

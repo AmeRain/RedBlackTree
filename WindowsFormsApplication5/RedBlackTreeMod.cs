@@ -38,7 +38,15 @@ namespace RedBlackTreeNamespace
             root = null;
             NIL = new TreeNode(0, TreeColor.black,0);
             MaxLevel = 0;
+            current = null;
         }
+
+        public void For_Search(int number)
+        {
+            Search_Node(root, number);
+             
+        }
+
         void Search_Node(TreeNode temp, int number)
         {
             if (temp != NIL)
@@ -420,9 +428,14 @@ namespace RedBlackTreeNamespace
             TreeNode x = root;
 	        while (x!=NIL) {
 		        y = x;
-		        if (z.data <= x.data)
-			        x = x.left;
-		        else x = x.right;
+                if (z.data < x.data)
+                    x = x.left;
+                else
+                {
+                    if (z.data > x.data)
+                        x = x.right;
+                    else return;
+                }
 	        }
         z.parent = y;
 	        if (y == NIL)
@@ -445,7 +458,7 @@ namespace RedBlackTreeNamespace
         public PaintingTree bfs()
         {
             int countLevel = MaxLevel + 1;//определять макс лвл
-            PaintingTree showtree = new PaintingTree(countLevel);
+            PaintingTree showtree = new PaintingTree(countLevel,current);
 
             Queue<TreeNode> theQueue = new Queue<TreeNode>(0);
             root.visited = true;
